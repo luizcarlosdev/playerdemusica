@@ -1,8 +1,11 @@
 let musicas = [
-    {titulo:"J'ai le coeur en joie",artista:"Chantal Goya",img:"imagens/chantal.jpg",src:"audios/Chantal-Goya-Jai-Le-Cœur-En-Joie-Jai-Le-Cœur-En-Peine-1967-.mp3"},
-    {titulo:"Valse Sentimentale",artista:"Tchaikovsky",img:"imagens/tchaikovsky.jpg",src:"audios/Tchaikovsky-Valse-Sentimentale.mp3"},
-    {titulo:"Lacrimosa",artista:"Mozart",img:"imagens/mozart.jpg",src:"audios/Mozart-Lacrimosa.mp3"},
+    { titulo: "J'ai le coeur en joie", artista: "Chantal Goya", img: "imagens/chantal.jpg", src: "audios/Chantal-Goya-Jai-Le-Cœur-En-Joie-Jai-Le-Cœur-En-Peine-1967-.mp3" },
+    { titulo: "Valse Sentimentale", artista: "Tchaikovsky", img: "imagens/tchaikovsky.jpg", src: "audios/Tchaikovsky-Valse-Sentimentale.mp3" },
+    { titulo: "Lacrimosa", artista: "Mozart", img: "imagens/mozart.jpg", src: "audios/Mozart-Lacrimosa.mp3" },
 ]
+
+document.querySelector("#btn-play").style.display = "none";
+document.querySelector("#btn-pause").style.display = "block";
 
 let audio = document.querySelector("audio");
 let img = document.querySelector("img");
@@ -13,15 +16,15 @@ let fim = document.querySelector(".fim");
 
 renderizarMusica(indexMusica);
 
-
-audio.addEventListener("timeupdate",atualizarPlayer)
-document.querySelector("#btn-play").addEventListener("click",iniciarMusica);
-document.querySelector("#btn-pause").addEventListener("click",pausarMusica);
+audio.addEventListener("timeupdate", atualizarPlayer)
+audio.addEventListener("ended", reproduzirProximaMusica);
+document.querySelector("#btn-play").addEventListener("click", iniciarMusica);
+document.querySelector("#btn-pause").addEventListener("click", pausarMusica);
 
 let voltar = document.querySelector("#btn-backward");
-voltar.addEventListener("click",() => {
+voltar.addEventListener("click", () => {
     indexMusica--;
-    if(indexMusica < 0) {
+    if (indexMusica < 0) {
         indexMusica = 2
     }
 
@@ -29,19 +32,32 @@ voltar.addEventListener("click",() => {
 })
 
 let avancar = document.querySelector("#btn-forward");
-avancar.addEventListener("click",() => {
+avancar.addEventListener("click", () => {
     indexMusica++;
-    if(indexMusica > 2){
+    if (indexMusica > 2) {
         indexMusica = 0
     }
 
     renderizarMusica(indexMusica);
 })
 
+function reproduzirProximaMusica() {
+    document.querySelector("#btn-play").style.display = "none";
+    document.querySelector("#btn-pause").style.display = "block";
+    indexMusica++;
+    if (indexMusica >= musicas.length) {
+        indexMusica = 0;
+    }
+    renderizarMusica(indexMusica);
+    // audio.play()
+    // document.querySelector("#btn-play").style.display = "none";
+    // document.querySelector("#btn-pause").style.display = "block";
+}
+
 function renderizarMusica(index) {
-    audio.setAttribute("src",musicas[index].src);
-    audio.addEventListener("loadeddata",() => {
-        img.setAttribute("src",musicas[index].img);
+    audio.setAttribute("src", musicas[index].src);
+    audio.addEventListener("loadeddata", () => {
+        img.setAttribute("src", musicas[index].img);
         nomeMusica.textContent = musicas[index].titulo;
         nomeArtista.textContent = musicas[index].artista;
         fim.textContent = conversorSegundos(Math.floor(audio.duration));
@@ -49,6 +65,7 @@ function renderizarMusica(index) {
         document.querySelector("#btn-pause").style.display = "none";
     })
 }
+
 function iniciarMusica() {
     audio.play()
     document.querySelector("#btn-play").style.display = "none";
@@ -63,18 +80,18 @@ function pausarMusica() {
 
 function atualizarPlayer() {
     let barra = document.querySelector("progress");
-    barra.style.width = Math.floor((audio.currentTime/ audio.duration)*100)+"%";
+    barra.style.width = Math.floor((audio.currentTime / audio.duration) * 100) + "%";
     let minutagem = document.querySelector(".inicio");
     minutagem.textContent = conversorSegundos(Math.floor(audio.currentTime))
 }
 
 function conversorSegundos(seg) {
-    let minutos = Math.floor(seg/60);
+    let minutos = Math.floor(seg / 60);
     let segundos = seg % 60;
-    if(segundos < 10) {
-        segundos = "0"+segundos;
+    if (segundos < 10) {
+        segundos = "0" + segundos;
     }
 
-    return minutos+":"+segundos;
+    return minutos + ":" + segundos;
 }
 
